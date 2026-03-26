@@ -1,0 +1,153 @@
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>管理系统</title>
+    <style>
+        *{
+            padding:0px;
+            margin:0px;
+            box-sizing: border-box;
+        }
+        body{
+            font-family: Microsoft YaHei, sans-serif;
+            line-height: 1.6;
+        }
+        .container{
+            display:flex;
+            min-height: 100vh;
+        }
+        .main-content{
+            flex:1;
+            padding:30px;
+            margin-right: 300px;
+            transition: margin-right 0.3 ease;
+        }
+        .right-select{
+            width: 300px;
+            height: 100vh;
+            top:0;
+            right: 0;
+            position: fixed;
+            padding:25px;
+            border-left: 1px solid #dee2e6;
+            z-index: 999;
+            background:  #f8f9fa;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        .right-select.hidden{
+            transform: translateX(100%);
+        }
+        .main-content.full-width{
+            margin-right: 0;
+        }
+        .right-button{
+            display: block;
+            padding: 12px;
+            margin:8px 0;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.3s;
+        }
+        .right-button.active{
+            background: #0d6efd;
+            color: #fff;
+            border-color: #0d6efd;
+        }
+        .right-button :hover{
+            background: #e9ecef;
+        }
+        .right-button.active :hover{
+            background: #0b5ed7;
+        }
+        .content-panel{
+            display: none;
+        }
+        .content-panel.active{
+            display: block;
+        }
+        .toggle-button{
+            position: fixed;
+            top:20px;
+            right:20px;
+            z-index: 1000;
+            padding: 10px 15px;
+            background: #0d6efd;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: right 0.3 ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content" id="mainContent">
+            <div class="content-panel" id="panel-home">
+                <h1>登录页面</h1>
+                <p>山东大学</p>
+                <p>信息管理系统</p>
+                <p>右侧显示区</p>
+            </div>
+            <div class="content-panel" id="panel-profile">
+                <iframe src="chakan.html" style="width:100%;height:800px;border: none;"></iframe>
+            </div>
+            <div class="content-panel" id="panel-settings">
+                <h1>系统设置</h1>
+                <p>这里是系统配置选项</p>
+            </div>
+            <div class="content-panel" id="panel-help">
+                <h1>帮助中心</h1>
+                <p>这里是使用说明与常见问题</p>
+            </div>
+        </div>
+        <div class="right-select" id="rightselect">
+            <h3>目录</h3>
+            <button class="right-button" data-target="panel-home" onclick="switchContent(this)">
+                首页
+            </button>
+            <button class="right-button" data-target="panel-profile" onclick="switchContent(this)">
+                个人中心
+            </button>
+            <button class="right-button" data-target="panel-settings" onclick="switchContent(this)">
+                系统设置
+            </button>
+            <button class="right-button" data-target="panel-help" onclick="switchContent(this)">
+                帮助中心
+            </button>
+        </div>
+    </div>
+    <button class="toggle-button" id="togglebutton" onclick="toggleSidebar()">
+            关闭侧边栏
+    </button>
+    <script>
+        const select = document.getElementById('rightselect');
+        const main = document.getElementById('mainContent');
+        const togglebtn = document.getElementById('togglebutton');
+        function toggleSidebar(){
+            select.classList.toggle('hidden');
+            main.classList.toggle('full-width');
+            if(select.classList.contains('hidden')){
+                togglebtn.textContent = '打开侧边栏';
+            }else{
+                togglebtn.textContent = '关闭侧边栏';
+            }
+        }
+        function switchContent(clickbtn){
+            document.querySelectorAll('.right-button').forEach(btn =>{
+                btn.classList.remove('active');
+            });
+            clickbtn.classList.add('active');
+            const targetpanel = clickbtn.dataset.target;
+            document.querySelectorAll('.content-panel.active').forEach(panel =>{
+                panel.classList.remove('active');
+            });
+            document.getElementById(targetpanel).classList.add('active');
+        }
+    </script> 
+</body>
+</html>
