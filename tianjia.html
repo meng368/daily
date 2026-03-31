@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>图书登记</title>
+    <style>
+        .container{
+            width: 80%;
+            margin: 20px auto;
+            min-height: 80vh;
+            background-color: aliceblue;
+            border-color: blue;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding:10px;
+        }
+        .container > div{
+            text-align: center;
+        }
+        .picture-container{
+            margin: 20px;
+            padding: 20px;
+            border: 1px dashed #ccc;
+            max-width: 500px;
+        }
+        .preview {
+            margin-top: 10px;
+            max-width: 300px;
+            max-height: 300px;
+            display: none;
+            border: 1px solid #eee;
+        }
+        input{
+            margin-bottom: 10px;
+            width: 200px;
+            padding:0 20px;
+            font-size: 20px;
+            color: blue;
+        }
+        button{
+            height: 40px;
+            width: 60px;
+            background-color: blueviolet;
+            font-size: 20px;
+            color: aqua;
+        }
+        #msg{
+            text-align: center;
+            font-size: 20px;
+            color: brown;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>书名<input id="bookname" placeholder="请输入书名！"></div>
+        <div>书的简介<input id='bookintroduce' placeholder="请输入输的大致内容"></div>
+        <div class="picture-container">
+            <input type="file" accept="image/*" id="bookphoto">
+            <p id="tip">请添加图片</p>
+            <img id="photoshow" class='preview' alt="图片预览">
+        </div>
+        <div>
+            <button onclick="Create()">添加</button>
+        </div>
+        <div id="msg"></div>
+    </div>
+    <script>
+        const picture = document.getElementById("bookphoto");
+        const tip = document.getElementById("tip");
+        const previewImg = document.getElementById("photoshow");
+        const uploadBtn = document.querySelector("button[onclick='Create()']");
+        const MAX_SIZE = 2 * 1024 * 1024;
+        picture.addEventListener("change",function(e){
+            const file = e.target.files[0];
+            if (!file) {
+                tip.textContent = "请添加图片";
+                previewImg.style.display = "none";
+                return;
+            }
+            if (!file.type.startsWith("image/")) {
+                tip.textContent = "❌ 请选择图片文件！";
+                tip.style.color = "red";
+                previewImg.style.display = "none";
+                return;
+            }
+            if (file.size > MAX_SIZE) {
+                tip.textContent = "❌ 图片不能超过 2MB！";
+                tip.style.color = "red";
+                previewImg.style.display = "none";
+                return;
+            }
+            const reader= new FileReader();
+            reader.onload = function(event){
+                previewImg.src = event.target.result;
+                previewImg.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+        async function Create(){
+            const name = document.getElementById("bookname").value.trim();
+            const introduce = document.getElementById("bookintroduce").value.trim();
+            const file = picture.files[0];
+            const msgEl = document.getElementById('msg')
+            if (!name) {
+                alert("请输入书名！");
+                return;
+            }
+            if (!introduce) {
+                alert("请输入书的简介！");
+                return;
+            }
+            if (!file) {
+                alert("请选择一张图片！");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("introduce", introduce);
+            formData.append("picture", file);
+            response = await fetch('http://127.0.0.1:8005/createbook',{
+                method:'POST',
+                body:formData,
+            });
+            if(response.ok){
+                data = await response.json();
+                msgEl.textContent = data.message;
+                name.value = "";
+                introduce.value = "";
+                picture.value = "";
+                previewImg.style.display = "none";
+                tip.textContent = "请添加图片";
+                tip.style.color = "black";
+            }else{
+                data = await response.json();
+                msgEl.textContent = data.detail;
+            }            
+        }
+    </script>
+</body>
